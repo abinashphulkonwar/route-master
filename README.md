@@ -18,7 +18,9 @@ Once you have Go installed, you can download and install Route-Master using the 
 
 ```sh
 $ go get github.com/abinashphulkonwar/route-master
+```
 ## or build binary for your operation system
+```
 & go build github.com/abinashphulkonwar/route-master
 ```
 
