@@ -23,6 +23,8 @@ $ go get github.com/abinashphulkonwar/route-master
 ```
 $ go build github.com/abinashphulkonwar/route-master
 ```
+or download from [![LinkedIn]](https://www.linkedin.com/in/abinash-phulkonwar-775b521a5/)
+https://github.com/abinashphulkonwar/route-master/releases/download/v1.0.0
 
 # Configuration
 
