@@ -32,17 +32,19 @@ server:
 node:
   - node1:
     scheme: "http"
-    host: "localhost"
-    port: 3000
+    target:
+      - "server1.8080"
+      - "server2.8081"
     path: "/api"
   - node2:
     scheme: "http"
-    host: "localhost"
-    port: 3001
-    path: "*"
+    target:
+      - "server3:8443"
+      - "server4:8080"
+    path: "/auth"
 ```
 
-This configuration file defines two routes: one for the /api path and another for the /auth path. The /api route targets server1 and server2, both listening on port 8080. The /auth route targets server3 and server4, both listening on port 8443.
+This configuration file defines two routes: one for the /api path and another for the /auth path. The /api route targets server1 and server2, server1 listening on port 8080 and server2 listening on port 8081. The /auth route targets server3 and server4, server3 listening on port 8443 and server4 listening on port 8080
 
 You can also specify additional settings such as load balancing method, health checks, and timeouts in the configuration file. For more information on configuring Route-Master, please refer to the documentation.
 
