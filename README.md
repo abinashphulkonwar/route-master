@@ -17,9 +17,9 @@ To install Route-Master, you need to have Go installed on your system. You can i
 Once you have Go installed, you can download and install Route-Master using the following command:
 
 ```sh
-go get github.com/abinashphulkonwar/route-master
+$ go get github.com/abinashphulkonwar/route-master
 ## or build binary for your operation system
-go build github.com/abinashphulkonwar/route-master
+& go build github.com/abinashphulkonwar/route-master
 ```
 
 # Configuration
