@@ -21,7 +21,7 @@ $ go get github.com/abinashphulkonwar/route-master
 ```
 ## build binary for your operation system
 ```
-& go build github.com/abinashphulkonwar/route-master
+$ go build github.com/abinashphulkonwar/route-master
 ```
 
 # Configuration
