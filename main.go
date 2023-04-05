@@ -10,20 +10,29 @@ import (
 	"github.com/abinashphulkonwar/route-master/services"
 )
 
-// api/v1/coupon
-
 func main() {
-	services.StartNode()
+
 	config := services.ReadYaml()
 	director := func(request *http.Request) {
 		isFound := false
 		for _, node := range config.Node {
-
 			if strings.Contains(request.URL.Path, node.Path) {
-				log.Printf("%s %s %s %s %s %s %s", request.RemoteAddr, request.Method, request.URL.Path, node.Name, node.Scheme, node.Host, node.Port)
 
 				request.URL.Scheme = node.Scheme
-				request.URL.Host = node.Host + ":" + node.Port
+
+				currentConfig := node.Config
+
+				if currentConfig.Index < (currentConfig.Length - 1) {
+					currentConfig.Index++
+				} else {
+					currentConfig.Index = 0
+				}
+
+				currentNode := node.Target[currentConfig.Index]
+				println("currentConfig.Index", "🚀", currentConfig.Index, node.Target[currentConfig.Index], currentNode, " 🚀")
+
+				request.URL.Host = currentNode
+				log.Printf("%s %s %s %s %s %s", request.RemoteAddr, request.Method, request.URL.Path, node.Name, node.Scheme, currentNode)
 				isFound = true
 				break
 			}

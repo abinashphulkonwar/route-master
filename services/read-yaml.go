@@ -9,12 +9,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Count struct {
+	Count  int
+	Index  int
+	Length int
+}
+
 type Node struct {
-	Name   string `yaml:"-"`
-	Host   string `yaml:"host"`
-	Port   string `yaml:"port"`
-	Path   string `yaml:"path"`
-	Scheme string `yaml:"scheme"`
+	Name string `yaml:"-"`
+	// Host   string `yaml:"host"`
+	// Port   string `yaml:"port"`
+	Target []string `yaml:"target"`
+	Path   string   `yaml:"path"`
+	Scheme string   `yaml:"scheme"`
+	Config *Count
 }
 
 type Config struct {
@@ -31,7 +39,7 @@ func ReadYaml() *Config {
 	flag.Parse()
 
 	println(filename)
-	// Check if the -f flag is set
+	//	Check if the -f flag is set
 	if filename == "" {
 		log.Fatalf("error: -f flag is not set")
 	} else {
@@ -50,23 +58,27 @@ func ReadYaml() *Config {
 		log.Fatalf("error: %v", err)
 	}
 
-	var temp = []Node{}
+	for index, node := range config.Node {
+		println("node", node.Target[0], node.Target[1], node.Path, node.Scheme)
 
-	for _, node := range config.Node {
-		if node.Path == "*" {
-			temp = append(temp, Node{
-				Name:   node.Name,
-				Host:   node.Host,
-				Port:   node.Port,
-				Path:   "",
-				Scheme: node.Scheme,
-			})
-			break
+		if len(node.Target) == 0 {
+			log.Fatalf("target is empty")
 		}
-		temp = append(temp, node)
+
+		if node.Scheme == "" {
+			node.Scheme = "http"
+
+		}
+
+		if node.Path == "*" {
+			node.Path = ""
+
+		}
+
+		node.Config = &Count{Length: len(node.Target), Count: 0, Index: 0}
+		config.Node[index] = node
 
 	}
 
-	config.Node = temp
 	return &config
 }
