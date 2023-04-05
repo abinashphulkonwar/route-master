@@ -23,7 +23,7 @@ $ go get github.com/abinashphulkonwar/route-master
 ```
 $ go build github.com/abinashphulkonwar/route-master
 ```
-or download from [binary](https://github.com/abinashphulkonwar/route-master/releases/download/v1.0.0)
+or download [binary](https://github.com/abinashphulkonwar/route-master/releases/tag/v1.0.0)
 
 
 # Configuration
