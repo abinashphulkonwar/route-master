@@ -59,7 +59,7 @@ func ReadYaml() *Config {
 	}
 
 	for index, node := range config.Node {
-		println("node", node.Target[0], node.Target[1], node.Path, node.Scheme)
+		println("node", node.Target[0], node.Path, node.Scheme)
 
 		if len(node.Target) == 0 {
 			log.Fatalf("target is empty")
@@ -67,7 +67,6 @@ func ReadYaml() *Config {
 
 		if node.Scheme == "" {
 			node.Scheme = "http"
-
 		}
 
 		if node.Path == "*" {
