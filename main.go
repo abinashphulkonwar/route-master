@@ -48,6 +48,9 @@ func main() {
 
 	rp := &httputil.ReverseProxy{
 		Director: director,
+		Rewrite: func(r *httputil.ProxyRequest) {
+
+		},
 	}
 
 	if config.Server.Host == "" {
