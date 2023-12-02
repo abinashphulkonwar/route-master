@@ -7,12 +7,14 @@ import (
 	"net/http/httputil"
 	"strings"
 
+	"github.com/abinashphulkonwar/route-master/logger"
 	"github.com/abinashphulkonwar/route-master/services"
 )
 
 func main() {
 
 	config := services.ReadYaml()
+	Logger := logger.NewLogger()
 	director := func(request *http.Request) {
 		isFound := false
 		for _, node := range config.Node {
@@ -33,6 +35,15 @@ func main() {
 
 				request.URL.Host = currentNode
 				log.Printf("%s %s %s %s %s %s", request.RemoteAddr, request.Method, request.URL.Path, node.Name, node.Scheme, currentNode)
+				// create logger.log
+
+				Logger.Log(&logger.Log{
+					Method:  request.Method,
+					Path:    request.URL.Path,
+					Address: request.RemoteAddr,
+					Scheme:  node.Scheme,
+					Name:    node.Name,
+				})
 				isFound = true
 				break
 			}
@@ -48,6 +59,9 @@ func main() {
 
 	rp := &httputil.ReverseProxy{
 		Director: director,
+		// Rewrite: func(r *httputil.ProxyRequest) {
+
+		// },
 	}
 
 	if config.Server.Host == "" {
