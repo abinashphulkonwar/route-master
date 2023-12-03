@@ -22,7 +22,7 @@ type Log struct {
 
 func NewLogger() *Logger {
 	newQueue := services.NewQueue()
-	file, err := os.OpenFile("log.json", os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile("log", os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}
@@ -49,18 +49,21 @@ func (l *Logger) Log(event *Log) {
 func (l *Logger) start() {
 	defer l.file.Close()
 	endLine := []byte("\n")
-
+	logBuf := []byte{}
 	for {
 		isFound, list := l.queue.DequeueMany(5)
 		if isFound {
 
 			for _, log := range *list {
 				log = append(log, endLine...)
-				println(string(log))
 
-				l.file.Write(log)
+				logBuf = append(logBuf, log...)
+
 			}
 
+			l.file.Write(logBuf)
+			println(string(logBuf))
+			logBuf = []byte{}
 		}
 	}
 }
