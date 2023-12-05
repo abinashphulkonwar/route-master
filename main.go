@@ -88,6 +88,8 @@ type customTransport struct {
 	Transport http.RoundTripper
 }
 
+const message = "404 page not found"
+
 func (c *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	resp, err := c.Transport.RoundTrip(req)
 	if err != nil {
@@ -97,8 +99,8 @@ func (c *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 			Proto:         req.Proto,
 			ProtoMajor:    1,
 			ProtoMinor:    1,
-			Body:          io.NopCloser(bytes.NewBufferString("hii")),
-			ContentLength: int64(len("hii")),
+			Body:          io.NopCloser(bytes.NewBufferString(message)),
+			ContentLength: int64(len(message)),
 			Request:       req,
 			Header:        make(http.Header, 0),
 		}
