@@ -58,6 +58,7 @@ func (h *Health) checkHealth() {
 				h.check(node.Name, node.Scheme+url, node.Health)
 			}
 		}
+		time.Sleep(10 * time.Second)
 	}
 }
 
@@ -85,7 +86,6 @@ func (h *Health) hSet(key string, status bool) {
 	} else {
 		node.Error++
 	}
-
 	h.hMap.Store(key, &node)
 
 }
