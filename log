@@ -99,3 +99,9 @@
 {"Method":"GET","Path":"/api/i","Address":"127.0.0.1:59717","Scheme":"http","Name":""}
 {"Method":"GET","Path":"/api/uwh/sadknlksd","Address":"127.0.0.1:59717","Scheme":"http","Name":""}
 {"Method":"GET","Path":"/","Address":"127.0.0.1:59717","Scheme":"https","Name":""}
+{"Method":"GET","Path":"/","Address":"127.0.0.1:50721","Scheme":"https","Name":""}
+{"Method":"GET","Path":"/favicon.ico","Address":"127.0.0.1:50721","Scheme":"https","Name":""}
+{"Method":"GET","Path":"/dijsdlf","Address":"127.0.0.1:50721","Scheme":"https","Name":""}
+{"Method":"GET","Path":"/api/i","Address":"127.0.0.1:50721","Scheme":"http","Name":""}
+{"Method":"GET","Path":"/api/sajdbjsad","Address":"127.0.0.1:50721","Scheme":"http","Name":""}
+{"Method":"GET","Path":"/api/sajdbjsad","Address":"127.0.0.1:50721","Scheme":"http","Name":""}

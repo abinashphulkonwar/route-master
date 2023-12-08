@@ -3,8 +3,8 @@ package services
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -23,6 +23,7 @@ type Node struct {
 	Path   string   `yaml:"path"`
 	Scheme string   `yaml:"scheme"`
 	Config *Count
+	Health string `yaml:"health"`
 }
 
 type Config struct {
@@ -46,7 +47,7 @@ func ReadYaml() *Config {
 		fmt.Println("-f flag value:", filename)
 	}
 
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -60,7 +61,7 @@ func ReadYaml() *Config {
 
 	for index, node := range config.Node {
 		println("node", node.Target[0], node.Path, node.Scheme)
-
+		node.Name = fmt.Sprintf("node:%d", index)
 		if len(node.Target) == 0 {
 			log.Fatalf("target is empty")
 		}
