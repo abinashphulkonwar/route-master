@@ -83,7 +83,9 @@ func (h *Health) checkStatus(node string, url string, healthCheckPath string) {
 		h.hSetNode(key, nodeHealth)
 		return
 	}
+
 	total_check := nodeHealth.Success + nodeHealth.Error
+
 	if (nodeHealth.Error / total_check * 100) > 20 {
 		println("error: request fails", (total_check / nodeHealth.Error * 100))
 	}
