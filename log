@@ -113,3 +113,6 @@
 {"Method":"GET","Path":"/","Address":"127.0.0.1:51735","Scheme":"https","Name":"node:1","Time":"2023-12-08T19:04:20.2446404+05:30"}
 {"Method":"GET","Path":"/","Address":"127.0.0.1:49982","Scheme":"https","Name":"node:1","Time":"2023-12-08T19:41:55.8447831+05:30"}
 {"Method":"GET","Path":"/favicon.ico","Address":"127.0.0.1:49982","Scheme":"https","Name":"node:1","Time":"2023-12-08T19:41:56.7587802+05:30"}
+{"Method":"GET","Path":"/api/i","Address":"127.0.0.1:52229","Scheme":"http","Name":"node:0","Time":"2023-12-10T20:19:29.614667+05:30"}
+{"Method":"GET","Path":"/favicon.ico","Address":"127.0.0.1:52229","Scheme":"https","Name":"node:1","Time":"2023-12-10T20:19:32.1927044+05:30"}
+{"Method":"GET","Path":"/api/dsfsdf","Address":"127.0.0.1:52229","Scheme":"http","Name":"node:0","Time":"2023-12-10T20:19:37.9728291+05:30"}
