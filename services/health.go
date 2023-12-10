@@ -1,7 +1,9 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -16,50 +18,101 @@ type NodeHealth struct {
 type Health struct {
 	config *Config
 	hMap   sync.Map
+	file   *os.File
 }
 
 func NewHealth(config *Config) *Health {
+	file_ref, err := os.OpenFile("health.log", os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
 	health := Health{
 		config: config,
 		hMap:   sync.Map{},
+		file:   file_ref,
 	}
 	go health.checkHealth()
 	return &health
 }
 
+func (h *Health) getKey(node string, url string) string {
+	return node + ":" + url
+}
+
 func (h *Health) check(node string, url string, healthCheckPath string) {
 
 	request, err := http.NewRequest("GET", url+healthCheckPath, nil)
+	key := h.getKey(node, url)
 	if err != nil {
-		h.hSet(node+":"+url, false)
+		h.hSet(key, false)
 		println(err.Error())
 		return
 	}
 	res, err := http.DefaultClient.Do(request)
 	if err != nil {
-		h.hSet(node+":"+url, false)
+		h.hSet(key, false)
 		println(err.Error())
 		return
 	}
 	if res.StatusCode == 200 {
-		h.hSet(node+":"+url, true)
+		h.hSet(key, true)
 	} else {
-		h.hSet(node+":"+url, false)
+		h.hSet(key, false)
 		println("status code is not 200")
-
 	}
 
 }
 
 func (h *Health) checkHealth() {
+	defer h.file.Close()
 	for {
 		for _, node := range h.config.Node {
 			for _, url := range node.Target {
-				h.check(node.Name, node.Scheme+url, node.Health)
+				h.check(node.Name, node.Scheme+"://"+url, node.Health)
+				h.checkStatus(node.Name, node.Scheme+"://"+url, node.Health)
 			}
 		}
 		time.Sleep(10 * time.Second)
 	}
+}
+
+func (h *Health) checkStatus(node string, url string, healthCheckPath string) {
+	key := h.getKey(node, url)
+	val, isFound := h.hMap.Load(key)
+	if !isFound {
+		return
+	}
+	nodeHealth := val.(*NodeHealth)
+
+	if h.isExpired(nodeHealth.updatedAt) {
+		nodeHealth.Success = 0
+		nodeHealth.Error = 0
+		nodeHealth.updatedAt = time.Now()
+		h.hSetNode(key, nodeHealth)
+		return
+	}
+
+	total_check := nodeHealth.Success + nodeHealth.Error
+
+	if nodeHealth.Error > 0 && ((nodeHealth.Error / total_check * 100) > 20) {
+		println("error: request fails", (total_check / nodeHealth.Error * 100))
+		message := fmt.Sprintf("error: request fails  %d%; "+key+"\n", (total_check / nodeHealth.Error * 100))
+		_, err := h.file.WriteString(message)
+		if err != nil {
+			println(err)
+		}
+
+	}
+
+	if nodeHealth.Success > 0 && ((nodeHealth.Success / total_check * 100) < 70) {
+		println("error: request success only ", (total_check / nodeHealth.Success * 100))
+		message := fmt.Sprintf("error: request success only %d%; "+key+"\n", (total_check / nodeHealth.Success * 100))
+		_, err := h.file.WriteString(message)
+		if err != nil {
+			println(err)
+		}
+	}
+
 }
 
 func (h *Health) hSet(key string, status bool) {
@@ -72,6 +125,10 @@ func (h *Health) hSet(key string, status bool) {
 		} else {
 			node.Error++
 		}
+		if h.isExpired(node.updatedAt) {
+			node.updatedAt = time.Now()
+		}
+
 		return
 	}
 
@@ -88,4 +145,16 @@ func (h *Health) hSet(key string, status bool) {
 	}
 	h.hMap.Store(key, &node)
 
+}
+func (h *Health) hSetNode(key string, node *NodeHealth) {
+	h.hMap.Store(key, node)
+
+}
+
+func (h *Health) isExpired(arg time.Time) bool {
+	current_time := time.Now()
+
+	expired_time := arg.Add(5 * time.Minute)
+
+	return current_time.Unix() > expired_time.Unix()
 }

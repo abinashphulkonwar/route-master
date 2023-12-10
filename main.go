@@ -14,6 +14,8 @@ func main() {
 
 	config := services.ReadYaml()
 	Logger := logger.NewLogger()
+	services.NewHealth(config)
+
 	rp := &httputil.ReverseProxy{
 		Director: handler.Director(config, Logger),
 		Transport: &handler.CustomTransport{
