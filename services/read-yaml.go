@@ -31,7 +31,11 @@ type Config struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
 	} `yaml:"server"`
-	Node []Node `yaml:"node"`
+	Node     []Node `yaml:"node"`
+	Internal struct {
+		Target string `yaml:"target"`
+		Scheme string `yaml:"scheme"`
+	} `yaml:"internal"`
 }
 
 func ReadYaml() *Config {
