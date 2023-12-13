@@ -170,17 +170,28 @@ func (h *Health) updateTheService() {
 	var nodes []*NodeHealth
 	h.hMap.Range(func(key, value interface{}) bool {
 		node := value.(*NodeHealth)
+		if node == nil {
+			return false
+		}
 		nodes = append(nodes, node)
 		return true
 	})
+
+	if len(nodes) == 0 {
+		return
+	}
+
 	body, err := json.Marshal(nodes)
 	if err != nil {
 		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
 		return
 	}
+
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 	if err != nil {
 		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
 		return
 
 	}
@@ -188,6 +199,8 @@ func (h *Health) updateTheService() {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
+
 		return
 	}
 
@@ -197,5 +210,6 @@ func (h *Health) updateTheService() {
 		return
 	}
 	println("success: request updates health status at: ", url, req.Response.StatusCode)
+	h.file.WriteString("success: request updates health status at: " + url + req.Response.Status + "/n")
 
 }
