@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,6 +25,7 @@ type Health struct {
 
 func NewHealth(config *Config) *Health {
 	file_ref, err := os.OpenFile("health.log", os.O_CREATE|os.O_APPEND, 0666)
+	
 	if err != nil {
 		panic(err)
 	}
@@ -40,14 +43,14 @@ func (h *Health) getKey(node string, url string) string {
 }
 
 func (h *Health) check(node string, url string, healthCheckPath string) {
-
-	request, err := http.NewRequest("GET", url+healthCheckPath, nil)
 	key := h.getKey(node, url)
+	request, err := http.NewRequest("GET", url+healthCheckPath, nil)
 	if err != nil {
 		h.hSet(key, false)
 		println(err.Error())
 		return
 	}
+
 	res, err := http.DefaultClient.Do(request)
 	if err != nil {
 		h.hSet(key, false)
@@ -72,7 +75,8 @@ func (h *Health) checkHealth() {
 				h.checkStatus(node.Name, node.Scheme+"://"+url, node.Health)
 			}
 		}
-		time.Sleep(10 * time.Second)
+		h.updateTheService()
+		time.Sleep(25 * time.Second)
 	}
 }
 
@@ -157,4 +161,56 @@ func (h *Health) isExpired(arg time.Time) bool {
 	expired_time := arg.Add(5 * time.Minute)
 
 	return current_time.Unix() > expired_time.Unix()
+}
+
+func (h *Health) updateTheService() {
+	if h.config.Internal.Target == "" || h.config.Internal.Scheme == "" {
+		return
+	}
+	url := h.config.Internal.Scheme + "://" + h.config.Internal.Target
+	var nodes []*NodeHealth
+	h.hMap.Range(func(key, value interface{}) bool {
+		node := value.(*NodeHealth)
+		if node == nil {
+			return false
+		}
+		nodes = append(nodes, node)
+		return true
+	})
+
+	if len(nodes) == 0 {
+		return
+	}
+
+	body, err := json.Marshal(nodes)
+	if err != nil {
+		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
+		return
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	if err != nil {
+		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
+		return
+
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		println(err)
+		h.file.WriteString("error: internal: " + err.Error() + " " + url + "/n")
+
+		return
+	}
+
+	if res.StatusCode != 200 {
+		println("error: request fails to updates health status at: ", url)
+		h.file.WriteString("error: request fails to updates health status at: " + url + "/n")
+		return
+	}
+	println("success: request updates health status at: ", url, req.Response.StatusCode)
+	h.file.WriteString("success: request updates health status at: " + url + req.Response.Status + "/n")
+
 }

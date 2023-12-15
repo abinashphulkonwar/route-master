@@ -54,8 +54,10 @@ func (l *Logger) Log(event *Log) {
 
 func (l *Logger) start() {
 	defer l.file.Close()
+
 	endLine := []byte("\n")
 	logBuf := []byte{}
+
 	for {
 
 		isFound, list := l.queue.DequeueMany(50)
